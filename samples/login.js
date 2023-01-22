@@ -9,18 +9,21 @@
 //=====================================================================
 "use strict";
 
-var tjs = require('../teslajs');
-var fs = require('fs');
-require('colors');
-var program = require('commander');
+var tjs = require("../teslajs");
+var fs = require("fs");
+require("colors");
+var program = require("commander");
 
 program
-  .usage('[options] username password [MFA code] [MFA device name]')
-  .option('-U, --uri [string]', 'URI of test server (e.g. http://127.0.0.1:3000)')
+  .usage("[options] username password [MFA code] [MFA device name]")
+  .option(
+    "-U, --uri [string]",
+    "URI of test server (e.g. http://127.0.0.1:3000)"
+  )
   .parse(process.argv);
 
 if (program.args.length < 2) {
-    program.help();
+  program.help();
 }
 
 var username = program.args[0];
@@ -29,35 +32,37 @@ var mfaPassCode = program.args[2];
 var mfaDeviceName = program.args[3];
 
 if (program.uri) {
-    console.log("Setting portal URI to: " + program.uri);
-    tjs.setPortalBaseURI(program.uri);
+  console.log("Setting portal URI to: " + program.uri);
+  tjs.setPortalBaseURI(program.uri);
 }
 
-tjs.loginAsync({
+tjs
+  .loginAsync({
     username: username,
     password: password,
     mfaPassCode: mfaPassCode,
-    mfaDeviceName: mfaDeviceName
-}).done(
+    mfaDeviceName: mfaDeviceName,
+  })
+  .done(
     // success!
     function (result) {
-        if (!result.authToken) {
-            console.error("Login failed!".red);
-            process.exit(1);
-        }
+      if (!result.authToken) {
+        console.error("Login failed!".red);
+        process.exit(1);
+      }
 
-        var token = JSON.stringify(result.body);
+      var token = JSON.stringify(result.body);
 
-        if (token) {
-            console.log("Login " + "Successfull.".green);
-            //    console.log("OAuth token is: " + token.green);
+      if (token) {
+        console.log("Login " + "Successfull.".green);
+        //    console.log("OAuth token is: " + token.green);
 
-            fs.writeFileSync('.token', token, 'utf8');
-            console.log('Auth token saved!');
-        }
+        fs.writeFileSync(".token", token, "utf8");
+        console.log("Auth token saved!");
+      }
     },
     // failure!
     function (error) {
-        console.error(error);
+      console.error(error);
     }
-);
+  );
